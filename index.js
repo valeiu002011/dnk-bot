@@ -58,9 +58,9 @@ function formatDateTime(dateStr) {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return {
-    full: ${day} ${month} в ${hours}:${minutes},
-    time: ${hours}:${minutes},
-    date: ${day} ${month},
+    full: `${day} ${month} в ${hours}:${minutes}`,
+    time: `${hours}:${minutes}`,
+    date: `${day} ${month}`,
     hours: date.getHours()
   };
 }
@@ -74,20 +74,20 @@ async function sendWhatsApp(phone, message) {
   try {
     const cleanPhone = formatPhone(phone);
     if (!cleanPhone) return;
-    const chatId = ${cleanPhone}@c.us;
-    const url = ${GREEN_API_URL}/waInstance${GREEN_API_ID}/sendMessage/${GREEN_API_TOKEN};
+    const chatId = `${cleanPhone}@c.us`;
+    const url = `${GREEN_API_URL}/waInstance${GREEN_API_ID}/sendMessage/${GREEN_API_TOKEN}`;
     await axios.post(url, { chatId, message });
-    console.log(✅ Отправлено на ${phone});
+    console.log(`✅ Отправлено на ${phone}`);
   } catch (error) {
-    console.error(❌ Ошибка отправки на ${phone}:, error.response?.data || error.message);
+    console.error(`❌ Ошибка отправки на ${phone}:`, error.response?.data || error.message);
   }
 }
 
 async function getRecordDetails(recordId) {
   try {
-    const url = https://api.alteg.io/api/v1/record/${ALTEGIO_COMPANY_ID}/${recordId};
+    const url = `https://api.alteg.io/api/v1/record/${ALTEGIO_COMPANY_ID}/${recordId}`;
     const response = await axios.get(url, {
-      headers: { 'Authorization': Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN} }
+      headers: { 'Authorization': `Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN}` }
     });
     return response.data?.data || null;
   } catch (error) {
@@ -98,11 +98,11 @@ async function getRecordDetails(recordId) {
 
 async function confirmRecord(recordId) {
   try {
-    const url = https://api.alteg.io/api/v1/record/${ALTEGIO_COMPANY_ID}/${recordId};
+    const url = `https://api.alteg.io/api/v1/record/${ALTEGIO_COMPANY_ID}/${recordId}`;
     await axios.put(url, { confirmed: 1 }, {
-      headers: { 'Authorization': Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN} }
+      headers: { 'Authorization': `Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN}` }
     });
-    console.log(✅ Запись ${recordId} подтверждена);
+    console.log(`✅ Запись ${recordId} подтверждена`);
     return true;
   } catch (error) {
     console.error('❌ Ошибка подтверждения:', error.response?.data || error.message);
@@ -112,11 +112,11 @@ async function confirmRecord(recordId) {
 
 async function deleteRecord(recordId) {
   try {
-    const url = https://api.alteg.io/api/v1/record/${ALTEGIO_COMPANY_ID}/${recordId};
+    const url = `https://api.alteg.io/api/v1/record/${ALTEGIO_COMPANY_ID}/${recordId}`;
     await axios.delete(url, {
-      headers: { 'Authorization': Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN} }
+      headers: { 'Authorization': `Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN}` }
     });
-    console.log(✅ Запись ${recordId} удалена);
+    console.log(`✅ Запись ${recordId} удалена`);
     return true;
   } catch (error) {
     console.error('❌ Ошибка удаления:', error.response?.data || error.message);
@@ -129,9 +129,9 @@ async function getTomorrowRecords() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const dateStr = tomorrow.toISOString().split('T')[0];
-    const url = https://api.alteg.io/api/v1/records/${ALTEGIO_COMPANY_ID}?start_date=${dateStr}&end_date=${dateStr};
+    const url = `https://api.alteg.io/api/v1/records/${ALTEGIO_COMPANY_ID}?start_date=${dateStr}&end_date=${dateStr}`;
     const response = await axios.get(url, {
-      headers: { 'Authorization': Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN} }
+      headers: { 'Authorization': `Bearer ${ALTEGIO_TOKEN}, User ${ALTEGIO_TOKEN}` }
     });
     return response.data?.data || [];
   } catch (error) {
@@ -145,7 +145,7 @@ async function getTomorrowRecords() {
 // ==============================
 
 async function sendReminders(block) {
-  console.log(🕐 Запуск рассылки напоминаний блок ${block});
+  console.log(`🕐 Запуск рассылки напоминаний блок ${block}`);
   const records = await getTomorrowRecords();
 
   for (const record of records) {
@@ -160,9 +160,9 @@ async function sendReminders(block) {
     if (block === 1 && recordHour >= 15) continue;
     if (block === 2 && recordHour < 15) continue;
 
-    const key = ${record.id}_${block};
+    const key = `${record.id}_${block}`;
     if (sentReminders.has(key)) {
-      console.log(⏭️ Уже отправлено: ${key});
+      console.log(`⏭ Уже отправлено: ${key}`);
       continue;
     }
 
@@ -172,7 +172,7 @@ async function sendReminders(block) {
     const formatted = formatDateTime(record.datetime);
     const greeting = getGreeting();
 
-    const message = ${greeting}, ${clientName} 🌷\n\nНапоминаем, что завтра в ${formatted.time} Вы записаны к мастеру ${masterName} на ${serviceName}.\n\nПожалуйста, подтвердите Ваш визит:\n*1* — Подтверждаю ✅\n*2* — Хочу перенести 🔄\n*3* — Отменяю ❌\n\nС уважением, DNK Beauty 💕;
+    const message = `${greeting}, ${clientName} 🌷\n\nНапоминаем, что завтра в ${formatted.time} Вы записаны к мастеру ${masterName} на ${serviceName}.\n\nПожалуйста, подтвердите Ваш визит:\n*1* — Подтверждаю ✅\n*2* — Хочу перенести 🔄\n*3* — Отменяю ❌\n\nС уважением, DNK Beauty 💕`;
 
     await sendWhatsApp(phone, message);
     sentReminders.add(key);
@@ -183,7 +183,7 @@ async function sendReminders(block) {
       recordId: record.id,
       clientName,
       serviceName,
-      dateStr: ${formatted.date} в ${formatted.time}
+      dateStr: `${formatted.date} в ${formatted.time}`
     };
   }
 }
@@ -213,7 +213,7 @@ app.post('/webhook', async (req, res) => {
 
   // Игнорируем всё кроме записей
   if (data.resource !== 'record') {
-    console.log(⏭️ Игнорируем: ${data.resource});
+    console.log(`⏭ Игнорируем: ${data.resource}`);
     return;
   }
 
@@ -235,16 +235,16 @@ app.post('/webhook', async (req, res) => {
   let message = '';
 
   if (data.status === 'create') {
-    message = ${greeting}, ${clientName} 🌷\n\n*${formatted.full} Вы записаны к мастеру ${masterName} на ${serviceName}*\n\nБлагодарим Вас за выбор нашего салона💕\nС уважением, DNK Beauty;
+    message = `${greeting}, ${clientName} 🌷\n\n*${formatted.full} Вы записаны к мастеру ${masterName} на ${serviceName}*\n\nБлагодарим Вас за выбор нашего салона💕\nС уважением, DNK Beauty`;
 
   } else if (data.status === 'update') {
-    message = ${greeting}, ${clientName} 🌷\nВаша запись изменена.\n\nНовые детали записи:\n*${formatted.full} Вы записаны к мастеру ${masterName} на ${serviceName}*\n\nБлагодарим Вас за выбор нашего салона💕\nС уважением, DNK Beauty;
+    message = `${greeting}, ${clientName} 🌷\nВаша запись изменена.\n\nНовые детали записи:\n*${formatted.full} Вы записаны к мастеру ${masterName} на ${serviceName}*\n\nБлагодарим Вас за выбор нашего салона💕\nС уважением, DNK Beauty`;
 
   } else if (data.status === 'delete') {
-    message = ${greeting}, ${clientName} 🌷\n\nВаша запись на ${formatted.full} на ${serviceName} *снята*\n\nБудем вас ждать в другой день ☺️\nБлагодарим Вас за выбор нашего салона💕\nС уважением, DNK Beauty;
+    message = `${greeting}, ${clientName} 🌷\n\nВаша запись на ${formatted.full} на ${serviceName} *снята*\n\nБудем вас ждать в другой день ☺️\nБлагодарим Вас за выбор нашего салона💕\nС уважением, DNK Beauty`;
 
   } else {
-    console.log(⚠️ Неизвестный статус: ${data.status});
+    console.log(`⚠️ Неизвестный статус: ${data.status}`);
     return;
   }
 
@@ -262,7 +262,7 @@ app.post('/incoming', async (req, res) => {
   const text = data.messageData?.textMessageData?.textMessage?.trim();
 
   if (!phone || !text) return;
-  console.log(📱 Ответ от ${phone}: ${text});
+  console.log(`📱 Ответ от ${phone}: ${text}`);
 
   // Проверяем ожидает ли этот номер ответа
   const pending = pendingResponses[phone];
@@ -271,20 +271,20 @@ app.post('/incoming', async (req, res) => {
     if (text === '1') {
       // Подтверждение
       await confirmRecord(pending.recordId);
-      await sendWhatsApp(phone, Благодарим Вас за подтверждение записи! До встречи завтра 💕\nС уважением, DNK Beauty);
+      await sendWhatsApp(phone, `Благодарим Вас за подтверждение записи! До встречи завтра 💕\nС уважением, DNK Beauty`);
       delete pendingResponses[phone];
 
     } else if (text === '2') {
       // Перенос
-      await sendWhatsApp(phone, Пожалуйста, укажите удобную для Вас дату и время для переноса записи 🌷);
-      await sendWhatsApp(ADMIN_PHONE, ⚠️ Клиент ${pending.clientName} (${phone}) запросил перенос записи на ${pending.dateStr} на ${pending.serviceName}. Ожидает вашего ответа.);
+      await sendWhatsApp(phone, `Пожалуйста, укажите удобную для Вас дату и время для переноса записи 🌷`);
+      await sendWhatsApp(ADMIN_PHONE, `⚠️ Клиент ${pending.clientName} (${phone}) запросил перенос записи на ${pending.dateStr} на ${pending.serviceName}. Ожидает вашего ответа.`);
       delete pendingResponses[phone];
 
     } else if (text === '3') {
       // Отмена
       await deleteRecord(pending.recordId);
-      await sendWhatsApp(phone, Ваша запись снята. Будем ждать Вас в DNK Beauty в другой раз ☺️\nС уважением, DNK Beauty);
-      await sendWhatsApp(MANAGER_PHONE, ⚠️ Клиент ${pending.clientName} (${phone}) отменил запись на ${pending.dateStr} на ${pending.serviceName});
+      await sendWhatsApp(phone, `Ваша запись снята. Будем ждать Вас в DNK Beauty в другой раз ☺️\nС уважением, DNK Beauty`);
+      await sendWhatsApp(MANAGER_PHONE, `⚠️ Клиент ${pending.clientName} (${phone}) отменил запись на ${pending.dateStr} на ${pending.serviceName}`);
       delete pendingResponses[phone];
     }
     return;
@@ -296,7 +296,7 @@ app.post('/incoming', async (req, res) => {
 
   if (isGreeting || text === '0') {
     const greeting = getGreeting();
-    const menu = ${greeting}! 🌷 Добро пожаловать в DNK Beauty!\n\nЯ бот-помощник салона. Выберите нужный пункт:\n\n*1* — График работы 🕐\n*2* — Наши услуги и цены 💅\n*3* — Записаться онлайн 📅\n*4* — Связаться с администратором 👩‍💼;
+    const menu = `${greeting}! 🌷 Добро пожаловать в DNK Beauty!\n\nЯ бот-помощник салона. Выберите нужный пункт:\n\n*1* — График работы 🕐\n*2* — Наши услуги и цены 💅\n*3* — Записаться онлайн 📅\n*4* — Связаться с администратором 👩‍💼`;
     await sendWhatsApp(phone, menu);
     pendingResponses[phone] = { type: 'menu' };
     return;
@@ -305,20 +305,20 @@ app.post('/incoming', async (req, res) => {
   // Ответы на меню
   if (pendingResponses[phone]?.type === 'menu') {
     if (text === '1') {
-      await sendWhatsApp(phone, 🕐 *График работы DNK Beauty:*\n\nПонедельник — Воскресенье\n09:00 — 20:00\n\nМы работаем без выходных! 💕\n\nДля возврата в меню напишите *0*);
+      await sendWhatsApp(phone, `🕐 *График работы DNK Beauty:*\n\nПонедельник — Воскресенье\n09:00 — 20:00\n\nМы работаем без выходных! 💕\n\nДля возврата в меню напишите *0*`);
       delete pendingResponses[phone];
 
     } else if (text === '2') {
-      await sendWhatsApp(phone, 💅 *Наши услуги:*\n\n✨ Окрашивание волос\n✂️ Стрижка\n💇 Укладка\n💅 Маникюр\n🦶 Педикюр\n\nПрайслист скоро будет добавлен.\nДля записи напишите *3*\n\nДля возврата в меню напишите *0*);
+      await sendWhatsApp(phone, `💅 *Наши услуги:*\n\n✨ Окрашивание волос\n✂️ Стрижка\n💇 Укладка\n💅 Маникюр\n🦶 Педикюр\n\nПрайслист скоро будет добавлен.\nДля записи напишите *3*\n\nДля возврата в меню напишите *0*`);
       delete pendingResponses[phone];
 
     } else if (text === '3') {
-      await sendWhatsApp(phone, 📅 *Онлайн-запись:*\n\nСсылки на запись скоро будут добавлены.\n\nДля связи с администратором напишите *4*\n\nДля возврата в меню напишите *0*);
+      await sendWhatsApp(phone, `📅 *Онлайн-запись:*\n\nСсылки на запись скоро будут добавлены.\n\nДля связи с администратором напишите *4*\n\nДля возврата в меню напишите *0*`);
       delete pendingResponses[phone];
 
     } else if (text === '4') {
-      await sendWhatsApp(phone, 👩‍💼 Сейчас к Вам подключится администратор. Пожалуйста, подождите 🌷);
-      await sendWhatsApp(ADMIN_PHONE, ⚠️ Клиент (${phone}) ожидает помощи администратора в WhatsApp);
+      await sendWhatsApp(phone, `👩‍💼 Сейчас к Вам подключится администратор. Пожалуйста, подождите 🌷`);
+      await sendWhatsApp(ADMIN_PHONE, `⚠️ Клиент (${phone}) ожидает помощи администратора в WhatsApp`);
       delete pendingResponses[phone];
     }
     return;
@@ -332,7 +332,6 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(🚀 DNK Beauty Bot запущен на порту ${PORT});
+  console.log(`🚀 DNK Beauty Bot запущен на порту ${PORT}`);
   startScheduler();
 });
-
