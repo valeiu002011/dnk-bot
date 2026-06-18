@@ -257,6 +257,7 @@ app.post('/webhook', async (req, res) => {
 app.post('/incoming', async (req, res) => {
   res.sendStatus(200);
   const data = req.body;
+  console.log('📱 Входящий запрос:', JSON.stringify(data, null, 2));
 
   const phone = (data.senderData?.sender || data.senderId || '').replace('@c.us', '');
 const text = (data.messageData?.textMessageData?.textMessage || data.textMessage || data.messageData?.extendedTextMessageData?.text || data.extendedTextMessage?.text || '').trim();
