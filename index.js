@@ -258,8 +258,8 @@ app.post('/incoming', async (req, res) => {
   res.sendStatus(200);
   const data = req.body;
 
-  const phone = data.senderData?.sender?.replace('@c.us', '');
-  const text = data.messageData?.textMessageData?.textMessage?.trim();
+  const phone = (data.senderData?.sender || data.senderId || '').replace('@c.us', '');
+const text = (data.messageData?.textMessageData?.textMessage || data.textMessage || data.messageData?.extendedTextMessageData?.text || data.extendedTextMessage?.text || '').trim();
 
   if (!phone || !text) return;
   console.log(`📱 Ответ от ${phone}: ${text}`);
